@@ -1,0 +1,58 @@
+<?php
+
+use App\Http\Controllers\ParticipantController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SpinnerController;
+use App\Models\Participant;
+use App\Models\PrizeItem;
+use App\Models\WinLog;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+// Timpa route '/' bawaan Breeze
+Route::get('/', [ParticipantController::class, 'index'])->name('home');
+Route::post('/join', [ParticipantController::class, 'store'])->name('join')->middleware('throttle:joins');
+
+// Spinner Page
+Route::get('/spinner', [SpinnerController::class, 'index'])->name('spinner.index');
+Route::post('/spin', [SpinnerController::class, 'spin'])->name('spinner.spin');
+
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Prize Management
+    Route::get('/prizes', [App\Http\Controllers\Admin\PrizeController::class, 'index'])->name('prizes.index');
+    Route::post('/prizes', [App\Http\Controllers\Admin\PrizeController::class, 'store'])->name('prizes.store');
+    Route::patch('/prizes/{prize}', [App\Http\Controllers\Admin\PrizeController::class, 'update'])->name('prizes.update');
+    Route::delete('/prizes/{prize}', [App\Http\Controllers\Admin\PrizeController::class, 'destroy'])->name('prizes.destroy');
+    Route::post('/prizes/{prize}/import', [App\Http\Controllers\Admin\PrizeController::class, 'import'])->name('prizes.import');
+
+    // Participant Management
+    Route::get('/participants', [App\Http\Controllers\Admin\ParticipantController::class, 'index'])->name('participants.index');
+
+    // Win Log
+    Route::get('/winlog', [App\Http\Controllers\Admin\WinLogController::class, 'index'])->name('winlog.index');
+    Route::patch('/winlog/{winlog}/mark-as-sent', [App\Http\Controllers\Admin\WinLogController::class, 'markAsSent'])->name('winlog.markAsSent');
+
+    // Profile Management
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard', [
+            'stats' => [
+                'total_participants' => Participant::count(),
+                'total_wins' => WinLog::count(),
+                'remaining_items' => PrizeItem::where('is_available', true)->count(),
+            ],
+            'recent_wins' => WinLog::with(['participant', 'prizeItem.prize'])
+                ->latest()
+                ->take(5)
+                ->get()
+        ]);
+    })->middleware(['auth', 'verified'])->name('dashboard');
+});
+
+
+require __DIR__ . '/auth.php';
