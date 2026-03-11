@@ -45,9 +45,7 @@ class WinLogController extends Controller
     {
         $winlog->update(['is_sent' => true]);
 
-        // Menggunakan redirect back() standar Inertia akan menyebabkan reload halaman penuh.
-        // Cukup kembalikan respons no-content atau respons sukses singkat.
-        // Frontend akan mengurus pembaruan UI secara optimis atau melalui refetch.
-        return response()->noContent();
+        // A redirect response will trigger Inertia to automatically refresh the page props.
+        return redirect()->back();
     }
 }
