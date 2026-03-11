@@ -75,14 +75,17 @@ const SpinnerWheel = ({ prizes, rotation }) => {
                             style={{ transform: `rotate(${angle}deg)` }}
                         >
                             <span
-                                className="text-white font-bold text-sm"
+                                className="text-white font-bold text-xs leading-tight"
                                 style={{
                                     transform:
                                         "translateY(-100px) rotate(-90deg)", // Dorong teks ke luar dari pusat
                                     textShadow: "0 0 5px #000",
+                                    maxWidth: "110px",
+                                    textAlign: "center",
+                                    display: "block",
                                 }}
                             >
-                                {prize.name.substring(0, 12)}
+                                {prize.name}
                             </span>
                         </div>
                     );
