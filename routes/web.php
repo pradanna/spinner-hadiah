@@ -27,6 +27,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/prizes/{prize}', [App\Http\Controllers\Admin\PrizeController::class, 'destroy'])->name('prizes.destroy');
     Route::post('/prizes/{prize}/import', [App\Http\Controllers\Admin\PrizeController::class, 'import'])->name('prizes.import');
 
+    // Prize Item Management
+    Route::post('/prize-items', [App\Http\Controllers\Admin\PrizeItemController::class, 'store'])->name('prize-items.store');
+    Route::patch('/prize-items/{prize_item}', [App\Http\Controllers\Admin\PrizeItemController::class, 'update'])->name('prize-items.update');
+    Route::delete('/prize-items/{prize_item}', [App\Http\Controllers\Admin\PrizeItemController::class, 'destroy'])->name('prize-items.destroy');
+
     // Participant Management
     Route::get('/participants', [App\Http\Controllers\Admin\ParticipantController::class, 'index'])->name('participants.index');
 
