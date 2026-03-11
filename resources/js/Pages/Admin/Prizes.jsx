@@ -20,17 +20,17 @@ import SecondaryButton from "@/Components/SecondaryButton";
 
 // --- Flash Message Component ---
 const FlashMessage = () => {
-    const { flash = {}, errors } = usePage().props;
+    const { flash = {}, errors = {} } = usePage().props;
     const [visible, setVisible] = useState(false);
     const [message, setMessage] = useState("");
     const [type, setType] = useState("");
 
     useEffect(() => {
-        if (flash.success) {
+        if (flash?.success) {
             setMessage(flash.success);
             setType("success");
             setVisible(true);
-        } else if (flash.error) {
+        } else if (flash?.error) {
             setMessage(flash.error);
             setType("error");
             setVisible(true);
@@ -43,7 +43,7 @@ const FlashMessage = () => {
             setVisible(false);
         }
 
-        if (flash.success || flash.error || Object.keys(errors).length > 0) {
+        if (flash?.success || flash?.error || Object.keys(errors).length > 0) {
             const timer = setTimeout(() => {
                 setVisible(false);
             }, 5000);
