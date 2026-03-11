@@ -96,6 +96,28 @@ class PrizeController extends Controller
         return redirect()->route('prizes.index')->with('success', 'Kategori hadiah berhasil dihapus.');
     }
 
+    public function storeItem(Request $request, Prize $prize)
+    {
+        // Pastikan kategori bukan Zonk sebelum menambah item
+        if ($prize->is_zonk) {
+            return back()->withErrors(['unique_code' => 'Kategori Zonk tidak bisa memiliki kode unik.']);
+        }
+
+        $validated = $request->validate([
+            'unique_code' => 'required|string|max:255|unique:prize_items,unique_code',
+        ], [
+            'unique_code.required' => 'Kode unik tidak boleh kosong.',
+            'unique_code.unique' => 'Kode unik ini sudah ada di sistem.',
+        ]);
+
+        $prize->items()->create([
+            'unique_code' => $validated['unique_code'],
+            'is_available' => true,
+        ]);
+
+        return redirect()->back()->with('success', 'Kode unik berhasil ditambahkan.');
+    }
+
     public function import(Request $request, Prize $prize)
     {
         $request->validate([
