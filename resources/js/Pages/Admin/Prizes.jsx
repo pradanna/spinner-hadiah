@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm, usePage } from "@inertiajs/react";
+import { Head, useForm, usePage, router } from "@inertiajs/react";
 import {
     Package,
     Upload,
@@ -17,12 +17,16 @@ import InputError from "@/Components/InputError";
 import PrimaryButton from "@/Components/PrimaryButton";
 import Checkbox from "@/Components/Checkbox";
 import SecondaryButton from "@/Components/SecondaryButton";
+import DangerButton from "@/Components/DangerButton";
 
 export default function Prizes({ auth, prizes }) {
     // State untuk menyimpan hadiah mana yang sedang di-klik (di sebelah kanan)
     const [selectedPrize, setSelectedPrize] = useState(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isEditItemModalOpen, setIsEditItemModalOpen] = useState(false);
+    const [isDeleteItemModalOpen, setIsDeleteItemModalOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
 
     // Form Inertia untuk Upload CSV
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -69,6 +73,20 @@ export default function Prizes({ auth, prizes }) {
         name: "",
         probability: 0,
         is_zonk: false,
+    });
+
+    // Form Inertia untuk Edit Single Item
+    const {
+        data: editItemData,
+        setData: setEditItemData,
+        patch: patchItem,
+        processing: processingEditItem,
+        errors: editItemErrors,
+        reset: resetEditItem,
+        clearErrors: clearEditItemErrors,
+    } = useForm({
+        id: null,
+        unique_code: "",
     });
 
     // Menjaga selectedPrize tetap ter-update setelah upload CSV sukses (karena data props.prizes diperbarui Laravel)
@@ -146,6 +164,38 @@ export default function Prizes({ auth, prizes }) {
         ) {
             destroyPrize(route("prizes.destroy", prize.id));
         }
+    };
+
+    // --- Logic untuk Item (Kode Unik) ---
+
+    const openEditItemModal = (item) => {
+        clearEditItemErrors();
+        setEditItemData({
+            id: item.id,
+            unique_code: item.unique_code,
+        });
+        setIsEditItemModalOpen(true);
+    };
+
+    const handleUpdateItem = (e) => {
+        e.preventDefault();
+        patchItem(route("prize-items.update", editItemData.id), {
+            onSuccess: () => setIsEditItemModalOpen(false),
+            preserveScroll: true,
+        });
+    };
+
+    const handleDeleteItem = (item) => {
+        setItemToDelete(item);
+        setIsDeleteItemModalOpen(true);
+    };
+
+    const confirmDeleteItem = () => {
+        router.delete(route("prize-items.destroy", itemToDelete.id), {
+            preserveScroll: true,
+            onSuccess: () => setIsDeleteItemModalOpen(false),
+            onFinish: () => setItemToDelete(null),
+        });
     };
 
     return (
@@ -368,6 +418,9 @@ export default function Prizes({ auth, prizes }) {
                                                 <th className="p-3 font-semibold text-gray-600 text-sm border-b w-32 text-center">
                                                     Status
                                                 </th>
+                                                <th className="p-3 font-semibold text-gray-600 text-sm border-b w-24 text-center">
+                                                    Aksi
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -414,6 +467,40 @@ export default function Prizes({ auth, prizes }) {
                                                                         Terpakai
                                                                     </span>
                                                                 )}
+                                                            </td>
+                                                            <td className="p-3 text-center">
+                                                                <div className="flex items-center justify-center gap-2">
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            openEditItemModal(
+                                                                                item,
+                                                                            )
+                                                                        }
+                                                                        className="text-gray-400 hover:text-indigo-600 transition-colors"
+                                                                        title="Edit Kode"
+                                                                    >
+                                                                        <Edit
+                                                                            size={
+                                                                                16
+                                                                            }
+                                                                        />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            handleDeleteItem(
+                                                                                item,
+                                                                            )
+                                                                        }
+                                                                        className="text-gray-400 hover:text-red-600 transition-colors"
+                                                                        title="Hapus Kode"
+                                                                    >
+                                                                        <Trash2
+                                                                            size={
+                                                                                16
+                                                                            }
+                                                                        />
+                                                                    </button>
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                     ),
@@ -612,6 +699,82 @@ export default function Prizes({ auth, prizes }) {
                         </PrimaryButton>
                     </div>
                 </form>
+            </Modal>
+
+            {/* Modal Edit Item (Kode Unik) */}
+            <Modal
+                show={isEditItemModalOpen}
+                onClose={() => setIsEditItemModalOpen(false)}
+            >
+                <form onSubmit={handleUpdateItem} className="p-6">
+                    <h2 className="text-lg font-medium text-gray-900">
+                        Edit Kode Unik
+                    </h2>
+                    <div className="mt-6">
+                        <InputLabel
+                            htmlFor="edit_item_code"
+                            value="Kode Unik"
+                        />
+                        <TextInput
+                            id="edit_item_code"
+                            value={editItemData.unique_code}
+                            className="mt-1 block w-full"
+                            onChange={(e) =>
+                                setEditItemData("unique_code", e.target.value)
+                            }
+                            required
+                        />
+                        <InputError
+                            message={editItemErrors.unique_code}
+                            className="mt-2"
+                        />
+                    </div>
+                    <div className="mt-6 flex justify-end">
+                        <SecondaryButton
+                            onClick={() => setIsEditItemModalOpen(false)}
+                        >
+                            Batal
+                        </SecondaryButton>
+                        <PrimaryButton
+                            className="ms-3"
+                            disabled={processingEditItem}
+                        >
+                            {processingEditItem ? "Menyimpan..." : "Simpan"}
+                        </PrimaryButton>
+                    </div>
+                </form>
+            </Modal>
+
+            {/* Modal Konfirmasi Hapus Item */}
+            <Modal
+                show={isDeleteItemModalOpen}
+                onClose={() => setIsDeleteItemModalOpen(false)}
+            >
+                <div className="p-6">
+                    <h2 className="text-lg font-medium text-gray-900">
+                        Konfirmasi Hapus Kode
+                    </h2>
+                    <p className="mt-1 text-sm text-gray-600">
+                        Apakah Anda yakin ingin menghapus kode unik{" "}
+                        <span className="font-bold text-gray-800">
+                            "{itemToDelete?.unique_code}"
+                        </span>
+                        ? Tindakan ini tidak dapat dibatalkan.
+                    </p>
+                    <div className="mt-6 flex justify-end">
+                        <SecondaryButton
+                            onClick={() => setIsDeleteItemModalOpen(false)}
+                        >
+                            Batal
+                        </SecondaryButton>
+                        <DangerButton
+                            className="ms-3"
+                            onClick={confirmDeleteItem}
+                        >
+                            Hapus
+                        </DangerButton>
+                    </div>
+                </div>
             </Modal>
         </AuthenticatedLayout>
     );
