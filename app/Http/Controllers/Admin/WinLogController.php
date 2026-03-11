@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\WinLog;
+use App\Models\Prize;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -21,7 +22,7 @@ class WinLogController extends Controller
             $searchTerm = $request->input('search');
             $query->whereHas('participant', function ($q) use ($searchTerm) {
                 $q->where('name', 'like', "%{$searchTerm}%")
-                  ->orWhere('whatsapp_number', 'like', "%{$searchTerm}%");
+                    ->orWhere('whatsapp_number', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -31,12 +32,23 @@ class WinLogController extends Controller
             $query->where('is_sent', $status);
         }
 
+        // Handle filter prize
+        if ($request->filled('prize_id')) {
+            $query->whereHas('prizeItem', function ($q) use ($request) {
+                $q->where('prize_id', $request->input('prize_id'));
+            });
+        }
+
         // Ambil data, urutkan dari yang terbaru, dan paginasi
         $winLogs = $query->latest()->paginate(20)->withQueryString();
 
+        // Ambil semua data hadiah untuk opsi filter dropdown
+        $prizes = Prize::select('id', 'name')->get();
+
         return Inertia::render('Admin/WinLog', [
             'winLogs' => $winLogs,
-            'filters' => $request->only(['search', 'status']), // Kirim filter kembali ke frontend
+            'filters' => $request->only(['search', 'status', 'prize_id']), // Kirim filter kembali ke frontend
+            'prizes' => $prizes,
         ]);
     }
 
