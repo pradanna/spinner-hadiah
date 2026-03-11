@@ -9,6 +9,7 @@ use App\Models\WinLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use App\Jobs\SendPrizeWhatsapp;
 
 class SpinnerController extends Controller
 {
@@ -118,10 +119,15 @@ class SpinnerController extends Controller
                 }
 
                 // Buat log kemenangan
-                WinLog::create([
+                $winLog = WinLog::create([
                     'participant_id' => $participantId,
                     'prize_item_id' => $prizeItem ? $prizeItem->id : null,
                 ]);
+
+                // Jika pemenang mendapatkan hadiah (bukan zonk), kirim notifikasi WhatsApp
+                if ($prizeItem) {
+                    SendPrizeWhatsapp::dispatch($winLog);
+                }
 
                 // Update status item hadiah jika ada
                 if ($prizeItem) {
