@@ -28,6 +28,7 @@ class WinLog extends Model
         'is_sent',
     ];
 
+
     /**
      * The attributes that should be cast.
      *

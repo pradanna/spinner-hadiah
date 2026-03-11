@@ -1,13 +1,31 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, router, Link } from "@inertiajs/react";
-import { MessageSquare, Search, CheckCircle, XCircle } from "lucide-react";
+import { Head, router, Link, usePage } from "@inertiajs/react";
+import { MessageSquare, Search, CheckCircle, XCircle, Send, Loader2 } from "lucide-react";
 import Pagination from "@/Components/Pagination";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TextInput from "@/Components/TextInput";
 import PrimaryButton from "@/Components/PrimaryButton";
 
-export default function WinLog({ auth, winLogs, filters }) {
+export default function WinLog({ auth, winLogs: initialWinLogs, filters, flash }) {
     const [searchTerm, setSearchTerm] = useState(filters.search || "");
+    const [sendingId, setSendingId] = useState(null); // ID of the log being sent
+    const [showFlash, setShowFlash] = useState({ show: false, message: '', type: '' });
+
+    useEffect(() => {
+        if (flash?.success) {
+            setShowFlash({ show: true, message: flash.success, type: 'success' });
+        } else if (flash?.error) {
+            setShowFlash({ show: true, message: flash.error, type: 'error' });
+        }
+
+        if(flash?.success || flash?.error) {
+            const timer = setTimeout(() => {
+                setShowFlash({ show: false, message: '', type: '' });
+            }, 5000); // Hide after 5 seconds
+            return () => clearTimeout(timer);
+        }
+    }, [flash]);
+
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -18,29 +36,20 @@ export default function WinLog({ auth, winLogs, filters }) {
     };
 
     const handleSendMessage = (log) => {
-        // 1. Buka link WhatsApp di tab baru
-        const number = formatWhatsAppNumber(log.participant.whatsapp_number);
-        const message = `Halo ${log.participant.name}, selamat! Ini adalah kode unik hadiah kamu: ${log.prize_item.unique_code}`;
-        const waLink = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-        window.open(waLink, '_blank');
-
-        // 2. Jika belum terkirim, update status di DB
-        if (!log.is_sent) {
-            router.patch(route('winlog.markAsSent', log.id), {}, {
-                preserveScroll: true, // Agar halaman tidak scroll ke atas setelah update
-            });
+        if (log.is_sent) {
+            alert("Pesan untuk pemenang ini sudah dikirim.");
+            return;
         }
-    };
 
-    // Fungsi untuk memformat nomor WhatsApp
-    const formatWhatsAppNumber = (number) => {
-        let cleaned = ('' + number).replace(/\D/g, '');
-        if (cleaned.startsWith('0')) {
-            cleaned = '62' + cleaned.substring(1);
-        } else if (!cleaned.startsWith('62')) {
-            cleaned = '62' + cleaned;
+        if (!confirm(`Kirim pesan WhatsApp ke ${log.participant.name} (${log.participant.whatsapp_number})?`)) {
+            return;
         }
-        return cleaned;
+
+        router.post(route('winlog.sendWhatsapp', log.id), {}, {
+            preserveScroll: true,
+            onStart: () => setSendingId(log.id),
+            onFinish: () => setSendingId(null),
+        });
     };
 
     const StatusFilterLink = ({ status, label }) => {
@@ -57,6 +66,19 @@ export default function WinLog({ auth, winLogs, filters }) {
         );
     };
 
+    const FlashMessage = () => {
+        if (!showFlash.show) return null;
+
+        const baseClasses = "fixed top-20 right-5 z-50 px-4 py-3 rounded-lg shadow-lg text-white text-sm";
+        const typeClasses = showFlash.type === 'success' ? 'bg-green-500' : 'bg-red-500';
+
+        return (
+            <div className={`${baseClasses} ${typeClasses}`}>
+                {showFlash.message}
+            </div>
+        )
+    }
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -67,6 +89,8 @@ export default function WinLog({ auth, winLogs, filters }) {
             }
         >
             <Head title="Log Pemenang" />
+            <FlashMessage />
+
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -116,7 +140,7 @@ export default function WinLog({ auth, winLogs, filters }) {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {winLogs.data.length === 0 ? (
+                                        {initialWinLogs.data.length === 0 ? (
                                             <tr>
                                                 <td
                                                     colSpan="5"
@@ -126,7 +150,7 @@ export default function WinLog({ auth, winLogs, filters }) {
                                                 </td>
                                             </tr>
                                         ) : (
-                                            winLogs.data.map((log) => (
+                                            initialWinLogs.data.map((log) => (
                                                 <tr
                                                     key={log.id}
                                                     className={`border-b transition-colors ${log.is_sent ? 'bg-green-50/50' : 'hover:bg-gray-50'}`}
@@ -155,10 +179,16 @@ export default function WinLog({ auth, winLogs, filters }) {
                                                     <td className="p-3 text-center">
                                                         <button
                                                             onClick={() => handleSendMessage(log)}
-                                                            className="flex w-full items-center justify-center gap-2 text-sm font-semibold text-green-600 hover:text-green-800 bg-green-50 hover:bg-green-100 p-2 rounded-lg transition-all"
+                                                            disabled={log.is_sent || sendingId === log.id}
+                                                            className="flex w-full items-center justify-center gap-2 text-sm font-semibold p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                                         >
-                                                            <MessageSquare size={16} />
-                                                            Kirim Pesan
+                                                            {sendingId === log.id ? (
+                                                                <><Loader2 size={16} className="animate-spin" /> Mengirim...</>
+                                                            ) : log.is_sent ? (
+                                                                <><CheckCircle size={16} /> Terkirim</>
+                                                            ) : (
+                                                                <><Send size={16} /> Kirim Pesan</>
+                                                            )}
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -167,7 +197,7 @@ export default function WinLog({ auth, winLogs, filters }) {
                                     </tbody>
                                 </table>
                             </div>
-                            <Pagination links={winLogs.links} className="mt-6" />
+                            <Pagination links={initialWinLogs.links} className="mt-6" />
                         </div>
                     </div>
                 </div>

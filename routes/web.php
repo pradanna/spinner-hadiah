@@ -32,7 +32,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Win Log
     Route::get('/winlog', [App\Http\Controllers\Admin\WinLogController::class, 'index'])->name('winlog.index');
-    Route::patch('/winlog/{winlog}/mark-as-sent', [App\Http\Controllers\Admin\WinLogController::class, 'markAsSent'])->name('winlog.markAsSent');
+    Route::post('/winlog/{winlog}/send-whatsapp', [App\Http\Controllers\Admin\WinLogController::class, 'sendWhatsapp'])->name('winlog.sendWhatsapp');
 
     // Profile Management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
