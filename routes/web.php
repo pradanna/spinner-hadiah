@@ -34,6 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Participant Management
     Route::get('/participants', [App\Http\Controllers\Admin\ParticipantController::class, 'index'])->name('participants.index');
+    Route::get('/participants/export', [App\Http\Controllers\Admin\ParticipantController::class, 'export'])->name('participants.export');
 
     // Win Log
     Route::get('/winlog', [App\Http\Controllers\Admin\WinLogController::class, 'index'])->name('winlog.index');
