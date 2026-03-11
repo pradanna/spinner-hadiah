@@ -45,6 +45,11 @@ class ParticipantController extends Controller
         $filename = "participants_{$timestamp}";
 
         if ($format === 'xlsx') {
+            // 1. Jebol limit RAM (Tak Terbatas)
+            ini_set('memory_limit', '-1');
+            // 2. Jebol limit waktu eksekusi agar tidak timeout
+            set_time_limit(0);
+
             return Excel::download(new ParticipantsExport(), "{$filename}.xlsx");
         }
 
