@@ -55,7 +55,7 @@ class WinLog extends Model
     }
 
     /**
-     * Setiap log kemenangan terhubung ke satu jenis hadiah.
+     * Setiap log kemenangan terhubung ke satu jenis hadiah.a
      */
     public function prize(): BelongsTo
     {
