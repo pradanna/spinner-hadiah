@@ -10,13 +10,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Jadikan halaman "Segera Hadir" sebagai halaman utama
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
-
-// Buat rute baru untuk mengakses halaman form pendaftaran asli untuk testing
-// Route::get('/welcome-test', [ParticipantController::class, 'index'])->name('welcome.test');
+// Halaman Utama (Form Pendaftaran)
+Route::get('/', [ParticipantController::class, 'index'])->name('home');
 
 Route::post('/join', [ParticipantController::class, 'store'])->name('join')->middleware('throttle:joins');
 
