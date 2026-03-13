@@ -170,6 +170,10 @@ export default function WinLog({
             <FlashMessage />
 
             <div className="py-12">
+                <SecondaryButton onClick={handleExport} className="!px-3">
+                    <FileDown size={16} className="mr-2" />
+                    Export
+                </SecondaryButton>
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
@@ -219,13 +223,6 @@ export default function WinLog({
                                     <PrimaryButton type="submit">
                                         <Search size={16} />
                                     </PrimaryButton>
-                                    <SecondaryButton
-                                        onClick={handleExport}
-                                        className="!px-3"
-                                    >
-                                        <FileDown size={16} className="mr-2" />
-                                        Export
-                                    </SecondaryButton>
                                 </form>
                             </div>
 
