@@ -171,10 +171,15 @@ export default function WinLog({
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <SecondaryButton onClick={handleExport} className="!px-3">
-                        <FileDown size={16} className="mr-2" />
-                        Export
-                    </SecondaryButton>
+                    <div className="flex justify-end mb-4">
+                        <SecondaryButton
+                            onClick={handleExport}
+                            className="!px-3"
+                        >
+                            <FileDown size={16} className="mr-2" />
+                            Export
+                        </SecondaryButton>
+                    </div>
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
                             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
