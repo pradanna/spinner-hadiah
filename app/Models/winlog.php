@@ -24,6 +24,7 @@ class WinLog extends Model
      */
     protected $fillable = [
         'participant_id',
+        'prize_id',
         'prize_item_id',
         'is_sent',
     ];
@@ -55,7 +56,7 @@ class WinLog extends Model
     }
 
     /**
-     * Setiap log kemenangan terhubung ke satu jenis hadiah.a
+     * Setiap log kemenangan terhubung ke satu jenis hadiah.
      */
     public function prize(): BelongsTo
     {

@@ -121,13 +121,12 @@ class SpinnerController extends Controller
                 // Buat log kemenangan
                 $winLog = WinLog::create([
                     'participant_id' => $participantId,
+                    'prize_id' => $wonPrize->id,
                     'prize_item_id' => $prizeItem ? $prizeItem->id : null,
                 ]);
 
-                // Jika pemenang mendapatkan hadiah (bukan zonk), kirim notifikasi WhatsApp
-                if ($prizeItem) {
-                    SendPrizeWhatsapp::dispatch($winLog);
-                }
+                // Kirim notifikasi WhatsApp untuk semua pemenang (termasuk Zonk)
+                SendPrizeWhatsapp::dispatch($winLog);
 
                 // Update status item hadiah jika ada
                 if ($prizeItem) {

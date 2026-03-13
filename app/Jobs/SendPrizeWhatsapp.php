@@ -67,7 +67,8 @@ class SendPrizeWhatsapp implements ShouldQueue
                 . "•⁠  ⁠⁠Selamat Menonton\n\n"
                 . "Cheers";
         } else {
-            $message = "Selamat kamu mendapatkan {$prizeName}\n{$this->winlog->prizeItem->unique_code}";
+            $message = "Halo {$this->winlog->participant->name}, selamat! Kamu mendapatkan {$prizeName} di nomor yang terdaftar ini ({$this->winlog->participant->whatsapp_number})\n\n"
+                . "Jangan lupa saksikan film TIBA TIBA SETAN Mulai 16 April 2026 di Bioskop Kesayanganmu!!!";
         }
 
         $response = Http::withHeaders([
