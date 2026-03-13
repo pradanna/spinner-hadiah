@@ -53,4 +53,12 @@ class WinLog extends Model
     {
         return $this->belongsTo(PrizeItem::class);
     }
+
+    /**
+     * Setiap log kemenangan terhubung ke satu jenis hadiah.
+     */
+    public function prize(): BelongsTo
+    {
+        return $this->belongsTo(Prize::class);
+    }
 }

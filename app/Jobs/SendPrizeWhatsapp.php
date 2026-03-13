@@ -56,7 +56,16 @@ class SendPrizeWhatsapp implements ShouldQueue
         if ($prizeName === 'Zonk') {
             $message = "Halo {$this->winlog->participant->name}, sayang sekali kamu belum beruntung kali ini. Coba lagi ya!";
         } else if (str_contains(strtolower($prizeName), 'voucher')) {
-            $message = "Halo {$this->winlog->participant->name}, selamat! Kamu memenangkan hadiah: {$prizeName}. \n\nIni adalah kode unik kamu: *{$this->winlog->prizeItem->unique_code}*";
+            $message = "Halo {$this->winlog->participant->name}, selamat! Kamu memenangkan hadiah: {$prizeName}\n\n"
+                . "Ini adalah kode unik kamu: *{$this->winlog->prizeItem->unique_code}*\n\n"
+                . "Cara penggunaaan :\n"
+                . "•⁠  ⁠Masuk ke aplikasi MTIX\n"
+                . "•⁠  ⁠⁠Pilih Film Tiba Tiba Setan\n"
+                . "•⁠  ⁠⁠Pilih Tgl 16 April 2026\n"
+                . "•⁠  ⁠⁠Pilih Kursi\n"
+                . "•⁠  ⁠⁠Masukkan kode voucher saat melakukan pembayaran\n"
+                . "•⁠  ⁠⁠Selamat Menonton\n\n"
+                . "Cheers";
         } else {
             $message = "Selamat kamu mendapatkan {$prizeName}\n{$this->winlog->prizeItem->unique_code}";
         }
