@@ -12,11 +12,11 @@ use Inertia\Inertia;
 
 // Jadikan halaman "Segera Hadir" sebagai halaman utama
 Route::get('/', function () {
-    return Inertia::render('SpinnerNotReady');
+    return Inertia::render('welcome');
 })->name('home');
 
 // Buat rute baru untuk mengakses halaman form pendaftaran asli untuk testing
-Route::get('/welcome-test', [ParticipantController::class, 'index'])->name('welcome.test');
+// Route::get('/welcome-test', [ParticipantController::class, 'index'])->name('welcome.test');
 
 Route::post('/join', [ParticipantController::class, 'store'])->name('join')->middleware('throttle:joins');
 
