@@ -70,6 +70,7 @@ class SendPrizeWhatsapp implements ShouldQueue
                 . "Cheers";
         } else {
             $message = "Halo {$this->winlog->participant->name}, selamat! Kamu mendapatkan saldo gopay 50K di nomor yang terdaftar ini ({$this->winlog->participant->whatsapp_number})\n\n"
+                . "ditunggu saldonya ya, tiba tiba saldomu bertambah \n\n"
                 . "Jangan lupa saksikan film TIBA TIBA SETAN Mulai 16 April 2026 di Bioskop Kesayanganmu!!!";
         }
 
