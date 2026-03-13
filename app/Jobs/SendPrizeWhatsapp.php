@@ -65,6 +65,8 @@ class SendPrizeWhatsapp implements ShouldQueue
                 . "•⁠  ⁠⁠Pilih Kursi\n"
                 . "•⁠  ⁠⁠Masukkan kode voucher saat melakukan pembayaran\n"
                 . "•⁠  ⁠⁠Selamat Menonton\n\n"
+                . "•⁠  ⁠Vocher hanya bisa digunakan untuk tanggal 16 April 2026 \n\n"
+
                 . "Cheers";
         } else {
             $message = "Halo {$this->winlog->participant->name}, selamat! Kamu mendapatkan {$prizeName} di nomor yang terdaftar ini ({$this->winlog->participant->whatsapp_number})\n\n"
