@@ -10,13 +10,23 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Timpa route '/' bawaan Breeze
-Route::get('/', [ParticipantController::class, 'index'])->name('home');
+// Jadikan halaman "Segera Hadir" sebagai halaman utama
+Route::get('/', function () {
+    return Inertia::render('SpinnerNotReady');
+})->name('home');
+
+// Buat rute baru untuk mengakses halaman form pendaftaran asli untuk testing
+Route::get('/welcome-test', [ParticipantController::class, 'index'])->name('welcome.test');
+
 Route::post('/join', [ParticipantController::class, 'store'])->name('join')->middleware('throttle:joins');
 
 // Spinner Page
 Route::get('/spinner', [SpinnerController::class, 'index'])->name('spinner.index');
 Route::post('/spin', [SpinnerController::class, 'spin'])->name('spinner.spin');
+
+Route::get('/coming-soon', function () {
+    return Inertia::render('SpinnerNotReady');
+})->name('coming.soon');
 
 
 Route::middleware(['auth', 'verified'])->group(function () {

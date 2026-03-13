@@ -137,8 +137,9 @@ class SpinnerController extends Controller
                 // Kembalikan hadiah yang dimenangkan untuk respons JSON
                 return [
                     'id' => $wonPrize->id,
-                    'name' => $wonPrize->name,
+                    'name' => $prizeItem ? $prizeItem->name : $wonPrize->name, // Jika ada item spesifik, gunakan namanya
                     'is_zonk' => $wonPrize->is_zonk,
+                    'category' => $wonPrize->name, // Kirim nama kategori asli untuk logika di frontend
                 ];
             });
 

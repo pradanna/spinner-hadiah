@@ -40,6 +40,8 @@ class SendPrizeWhatsapp implements ShouldQueue
             return;
         }
 
+        $this->winlog->load('participant', 'prize', 'prizeItem');
+
         $token = config('services.fonnte.token');
         if (!$token) {
             Log::error('Fonnte token is not set in services config.');
@@ -49,7 +51,15 @@ class SendPrizeWhatsapp implements ShouldQueue
         }
 
         $target = $this->formatWhatsAppNumber($this->winlog->participant->whatsapp_number);
-        $message = "Halo {$this->winlog->participant->name}, selamat! Kamu memenangkan hadiah: {$this->winlog->prizeItem->prize->name}. \n\nIni adalah kode unik kamu: *{$this->winlog->prizeItem->unique_code}*";
+        $prizeName = $this->winlog->prize->name;
+
+        if ($prizeName === 'Zonk') {
+            $message = "Halo {$this->winlog->participant->name}, sayang sekali kamu belum beruntung kali ini. Coba lagi ya!";
+        } else if (str_contains(strtolower($prizeName), 'voucher')) {
+            $message = "Halo {$this->winlog->participant->name}, selamat! Kamu memenangkan hadiah: {$prizeName}. \n\nIni adalah kode unik kamu: *{$this->winlog->prizeItem->unique_code}*";
+        } else {
+            $message = "Selamat kamu mendapatkan {$prizeName}\n{$this->winlog->prizeItem->unique_code}";
+        }
 
         $response = Http::withHeaders([
             'Authorization' => $token,

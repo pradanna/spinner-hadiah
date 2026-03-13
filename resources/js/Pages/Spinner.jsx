@@ -106,6 +106,9 @@ export default function Spinner({ prizes, error }) {
     const [rotation, setRotation] = useState(0);
     const [spinResult, setSpinResult] = useState(null);
 
+    // Asumsi: `prizes` memiliki properti `items_exists` (boolean) dari backend.
+    const hasStock = prizes.some(p => !p.is_zonk && p.items_exists);
+
     // Jika user sudah pernah spin sebelumnya
     if (error) {
         return (
@@ -116,6 +119,27 @@ export default function Spinner({ prizes, error }) {
                         Akses Ditolak
                     </h1>
                     <p className="text-gray-300">{error}</p>
+                    <button
+                        onClick={() => router.get(route("home"))}
+                        className="mt-6 bg-red-800 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700"
+                    >
+                        Kembali
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    // Jika semua hadiah (non-zonk) sudah habis
+    if (prizes.length > 0 && !hasStock) {
+        return (
+            <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+                <Head title="Habis" />
+                <div className="bg-gray-900 border border-red-800/50 p-8 rounded-lg shadow-md text-center">
+                    <h1 className="text-2xl font-bold text-red-600 mb-4">
+                        Mohon Maaf
+                    </h1>
+                    <p className="text-gray-300">Hadiah spinner untuk saat ini sudah habis.</p>
                     <button
                         onClick={() => router.get(route("home"))}
                         className="mt-6 bg-red-800 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700"
@@ -262,7 +286,9 @@ export default function Spinner({ prizes, error }) {
                             KAU BERUNTUNG...
                         </h2>
                         <p className="text-gray-400 text-lg mb-2">
-                            Kamu mendapatkan:
+                            {spinResult?.category?.toLowerCase() !== 'voucher'
+                                ? "Selamat kamu mendapatkan:"
+                                : "Kamu mendapatkan:"}
                         </p>
                         <p className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 mb-6">
                             {spinResult?.name}
