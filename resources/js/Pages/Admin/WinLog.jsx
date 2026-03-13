@@ -8,11 +8,13 @@ import {
     Send,
     Loader2,
     ExternalLink,
+    FileDown,
 } from "lucide-react";
 import Pagination from "@/Components/Pagination";
 import { useState, useEffect } from "react";
 import TextInput from "@/Components/TextInput";
 import PrimaryButton from "@/Components/PrimaryButton";
+import SecondaryButton from "@/Components/SecondaryButton";
 
 export default function WinLog({
     auth,
@@ -107,6 +109,15 @@ export default function WinLog({
         );
     };
 
+    const handleExport = () => {
+        const queryParams = new URLSearchParams({
+            search: searchTerm,
+            prize_id: prizeFilter,
+            status: filters.status || "",
+        }).toString();
+        window.location.href = route("winlog.export") + "?" + queryParams;
+    };
+
     const formatWhatsAppNumber = (number) => {
         let cleaned = ("" + number).replace(/\D/g, "");
         if (cleaned.startsWith("0")) {
@@ -168,11 +179,11 @@ export default function WinLog({
                                     <StatusFilterLink status="" label="Semua" />
                                     <StatusFilterLink
                                         status="sent"
-                                        label="Terkirim"
+                                        label="Whatsapp Terkirim"
                                     />
                                     <StatusFilterLink
                                         status="unsent"
-                                        label="Belum Terkirim"
+                                        label="Whatsapp Belum Terkirim"
                                     />
                                 </div>
                                 {/* Form Pencarian */}
@@ -208,6 +219,13 @@ export default function WinLog({
                                     <PrimaryButton type="submit">
                                         <Search size={16} />
                                     </PrimaryButton>
+                                    <SecondaryButton
+                                        onClick={handleExport}
+                                        className="!px-3"
+                                    >
+                                        <FileDown size={16} className="mr-2" />
+                                        Export
+                                    </SecondaryButton>
                                 </form>
                             </div>
 

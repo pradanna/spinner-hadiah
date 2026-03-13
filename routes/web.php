@@ -47,6 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Win Log
     Route::get('/winlog', [App\Http\Controllers\Admin\WinLogController::class, 'index'])->name('winlog.index');
     Route::post('/winlog/{winlog}/send-whatsapp', [App\Http\Controllers\Admin\WinLogController::class, 'sendWhatsapp'])->name('winlog.sendWhatsapp');
+    Route::get('/winlog/export', [App\Http\Controllers\Admin\WinLogController::class, 'export'])->name('winlog.export');
 
     // Profile Management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
