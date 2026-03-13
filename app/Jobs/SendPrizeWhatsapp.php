@@ -57,7 +57,7 @@ class SendPrizeWhatsapp implements ShouldQueue
             $message = "Halo {$this->winlog->participant->name}, sayang sekali kamu belum beruntung kali ini. Coba lagi ya!";
         } else if (str_contains(strtolower($prizeName), 'voucher')) {
             $message = "Halo {$this->winlog->participant->name}, selamat! Kamu memenangkan hadiah: {$prizeName}\n\n"
-                . "Ini adalah kode unik kamu: *{$this->winlog->prizeItem->unique_code}*\n\n"
+                . "Ini adalah kode unik kamu: *{$this->winlog->prizeItem?->unique_code}*\n\n"
                 . "Cara penggunaaan :\n"
                 . "•⁠  ⁠Masuk ke aplikasi MTIX\n"
                 . "•⁠  ⁠⁠Pilih Film Tiba Tiba Setan\n"
@@ -69,9 +69,8 @@ class SendPrizeWhatsapp implements ShouldQueue
 
                 . "Cheers";
         } else {
-            $message = "Halo {$this->winlog->participant->name}, selamat! Kamu mendapatkan {$prizeName} di nomor yang terdaftar ini ({$this->winlog->participant->whatsapp_number})\n\n"
-                . "Jangan lupa saksikan film TIBA TIBA SETAN Mulai 16 April 2026 di Bioskop Kesayanganmu!!! \n\n"
-                . "tiba tiba saldo mu akan bertambah ";
+            $message = "Halo {$this->winlog->participant->name}, selamat! Kamu mendapatkan saldo gopay 50K di nomor yang terdaftar ini ({$this->winlog->participant->whatsapp_number})\n\n"
+                . "Jangan lupa saksikan film TIBA TIBA SETAN Mulai 16 April 2026 di Bioskop Kesayanganmu!!!";
         }
 
         $response = Http::withHeaders([
