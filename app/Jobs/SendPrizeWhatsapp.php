@@ -53,7 +53,7 @@ class SendPrizeWhatsapp implements ShouldQueue
         $target = $this->formatWhatsAppNumber($this->winlog->participant->whatsapp_number);
         $prizeName = $this->winlog->prize->name;
 
-        if ($prizeName === 'Zonk') {
+        if (str_contains(strtolower($prizeName), 'zonk')) {
             $message = "Halo {$this->winlog->participant->name}, sayang sekali kamu belum beruntung kali ini. Coba lagi ya!";
         } else if (str_contains(strtolower($prizeName), 'voucher')) {
             $message = "Halo {$this->winlog->participant->name}, selamat! Kamu memenangkan hadiah: {$prizeName}\n\n"
